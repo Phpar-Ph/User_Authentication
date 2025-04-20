@@ -8,7 +8,7 @@ import userRouter from "./routes/userRoute.js";
 
 dotenv.config();
 const app = express();
-const port = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5000;
 connectDB();
 
 const allowedOrigins = ["http://localhost:5173"];
@@ -20,6 +20,6 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
 });
