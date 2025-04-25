@@ -38,6 +38,10 @@ function Navbar() {
     }
   };
 
+  const profile = () => {
+    navigate("/profile");
+  };
+
   return (
     <div className="h-20 w-full bg-red-400">
       <div className="flex justify-between items-center h-full px-40 text-2xl font-bold text-amber-50">
@@ -61,7 +65,12 @@ function Navbar() {
                         Verify mail
                       </li>
                     )}
-
+                    <li
+                      className="py-1 px-2 hover:bg-gray-200 cursor-pointer"
+                      onClick={profile}
+                    >
+                      Profile
+                    </li>
                     <li
                       className="py-1 px-2 hover:bg-gray-200 cursor-pointer"
                       onClick={logout}
