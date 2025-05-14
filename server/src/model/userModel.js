@@ -34,6 +34,10 @@ const userSchema = mongoose.Schema({
     type: Number,
     default: 0,
   },
+  profilePic: {
+    type: String,
+    default: "",
+  },
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

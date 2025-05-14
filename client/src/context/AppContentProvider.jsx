@@ -8,6 +8,7 @@ export const AppContent = createContext();
 export const AppContextProvider = (props) => {
   axios.defaults.withCredentials = true;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
+  const [profilePic, setProfilePic] = useState(null);
 
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(false);
@@ -28,10 +29,21 @@ export const AppContextProvider = (props) => {
   };
   const getUserData = async () => {
     try {
-      const { data } = await axios.get(backendUrl + "/api/user/data");
-      data.success ? setUserData(data.userData) : toast.error(data.message);
+      const { data } = await axios.get(`${backendUrl}/api/user/data`, {
+        withCredentials: true,
+      });
+
+      console.log("User data response:", data); // Debug log
+
+      if (data.success) {
+        setUserData(data.userData);
+        console.log("Updated userData:", data.userData); // Debug log
+      } else {
+        toast.error(data.message);
+      }
     } catch (error) {
-      toast.error(error.message);
+      console.error("Get user data error:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch user data");
     }
   };
 
@@ -42,6 +54,8 @@ export const AppContextProvider = (props) => {
 
   const value = {
     backendUrl,
+    setProfilePic,
+    profilePic,
     isLogin,
     setIsLogin,
     userData,

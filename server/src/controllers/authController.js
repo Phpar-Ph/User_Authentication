@@ -354,3 +354,42 @@ export const resetPassword = async (req, res) => {
     });
   }
 };
+
+export const addProfilePic = async (req, res) => {
+  try {
+    const { profilePic } = req.body;
+    const userId = req.userId; // From auth middleware
+
+    if (!profilePic) {
+      return res.status(400).json({
+        success: false,
+        message: "Profile picture URL is required",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { profilePic },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: "Profile picture updated successfully",
+      profilePic: updatedUser.profilePic,
+    });
+  } catch (error) {
+    console.error("Profile update error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update profile picture",
+    });
+  }
+};

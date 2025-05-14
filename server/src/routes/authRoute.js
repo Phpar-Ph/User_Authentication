@@ -9,6 +9,7 @@ import {
   isAuthenticated,
   sendPasswordResetOtp,
   resetPassword,
+  addProfilePic,
 } from "../controllers/authController.js";
 const authRouter = express.Router();
 
@@ -20,5 +21,6 @@ authRouter.post("/verify-email", userAuth, verifyEmail);
 authRouter.get("/is-auth", userAuth, isAuthenticated);
 authRouter.post("/send-reset-otp", sendPasswordResetOtp);
 authRouter.post("/reset-password", resetPassword);
+authRouter.post("/add-profile-pic", userAuth, addProfilePic);
 
 export default authRouter;
