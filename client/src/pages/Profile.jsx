@@ -6,7 +6,8 @@ import { toast } from "react-toastify";
 import { useNavigate } from "react-router";
 
 const Profile = () => {
-  const { backendUrl, getUserData, setProfilePic } = useContext(AppContent);
+  const { backendUrl, getUserData, setProfilePic, userData } =
+    useContext(AppContent);
   const navigate = useNavigate();
   const saveProfilePicture = async (fileUrl) => {
     try {
@@ -29,12 +30,21 @@ const Profile = () => {
       );
     }
   };
+
   return (
     <div className="flex justify-center flex-col items-center h-screen">
       <div>
         <h1 className="text-4xl font-bold text-amber-950  text-center mb-10">
           Profile Page
         </h1>
+      </div>
+      <div className="mb-10">
+        <h1>Name: {userData?.name}</h1> <h1>Email: {userData?.email}</h1>
+        {userData?.isAccountVerified ? (
+          <h1>Account is verified </h1>
+        ) : (
+          <h1>Account is not verified</h1>
+        )}
       </div>
       <div className="absolute top-0 left-0 p-10 ">
         <h1

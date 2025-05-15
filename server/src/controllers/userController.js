@@ -1,3 +1,4 @@
+import { EMAIL_RESET_OTP_TEMPLATE } from "../config/EmailTemplate.js";
 import User from "../model/userModel.js";
 export const getUserData = async (req, res) => {
   try {
@@ -12,6 +13,7 @@ export const getUserData = async (req, res) => {
       success: true,
       userData: {
         name: user.name,
+        email: user.email,
         profilePic: user.profilePic,
         isAccountVerified: user.isAccountVerified,
       },
