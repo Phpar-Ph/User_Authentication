@@ -14,7 +14,7 @@ const PORT = process.env.PORT || 5000;
 connectDB();
 
 const allowedOrigins = [
-  "http://localhost:5173",
+  // "http://localhost:5173",
   "https://user-authentication-frontend-6460.onrender.com",
 ];
 app.use(express.json());
