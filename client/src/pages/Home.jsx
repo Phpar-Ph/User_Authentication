@@ -12,22 +12,23 @@ function Home() {
   useEffect(() => {
     isLogin && getUserData();
   }, []);
-  console.log("userData:", userData);
-  console.log("profilePic:", userData?.profilePic);
+
   return (
     <div className="h-full w-full bg-blue-300">
       <Navbar />
       <div className="flex justify-center items-center h-screen">
         <div className=" ">
           <div className="p-4 mb-4 relative group">
-            <div
-              className="cursor-pointer  opacity-0 transition-opacity duration-300  group-hover:opacity-60 rounded-full flex  justify-center items-center bg-amber-50 w-96 h-96 text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 "
-              onClick={() => navigate("/profile")}
-            >
-              <h1 className="font-bold text-amber-950 text-2xl ">
-                Click to change profile picture
-              </h1>
-            </div>
+            {isLogin && (
+              <div
+                className="cursor-pointer  opacity-0 transition-opacity duration-300  group-hover:opacity-60 rounded-full flex  justify-center items-center bg-amber-50 w-96 h-96 text-center absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 "
+                onClick={() => navigate("/profile")}
+              >
+                <h1 className="font-bold text-amber-950 text-2xl ">
+                  Click to change profile picture
+                </h1>
+              </div>
+            )}
             <img
               src={userData?.profilePic ? userData.profilePic : defaultImage}
               alt="Profile"

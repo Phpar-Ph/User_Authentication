@@ -33,11 +33,11 @@ export const AppContextProvider = (props) => {
         withCredentials: true,
       });
 
-      console.log("User data response:", data); // Debug log
+      // console.log("User data response:", data); // Debug log
 
       if (data.success) {
         setUserData(data.userData);
-        console.log("Updated userData:", data.userData); // Debug log
+        // console.log("Updated userData:", data.userData); // Debug log
       } else {
         toast.error(data.message);
       }
