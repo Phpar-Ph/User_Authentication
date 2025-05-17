@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 import { AppContent } from "../context/AppContentProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
+import BackToHome from "../components/BackToHome";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -73,6 +74,7 @@ function ResetPassword() {
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-gray-500">
+      <BackToHome />
       {/* Enter email address */}
       {!isEmailSent && (
         <form onSubmit={onSubmitEmail}>

@@ -393,3 +393,36 @@ export const addProfilePic = async (req, res) => {
     });
   }
 };
+
+export const updateUserInfo = async (req, res) => {
+  try {
+    const { name, email, isAccountVerified } = req.body;
+    const userId = req.userId; // From auth middleware
+    // const user = await User.findById(req.userId);
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { name, email, isAccountVerified: false },
+      { new: true }
+    );
+
+    if (!updatedUser) {
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
+    }
+    // user.isAccountVerified = false;
+    // await user.save();
+    res.status(200).json({
+      success: true,
+      message: "User updated successfully",
+      user: updatedUser,
+    });
+  } catch (error) {
+    console.error("User update error:", error);
+    res.status(500).json({
+      success: false,
+      message: error.message || "Failed to update user",
+    });
+  }
+};

@@ -38,9 +38,9 @@ function Navbar() {
     }
   };
 
-  const profile = () => {
-    navigate("/profile");
-  };
+  // const profile = () => {
+  //   navigate("/profile");
+  // };
 
   return (
     <nav className="bg-gradient-to-r from-amber-600 to-amber-700 shadow-lg">

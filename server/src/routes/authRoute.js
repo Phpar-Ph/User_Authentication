@@ -10,6 +10,7 @@ import {
   sendPasswordResetOtp,
   resetPassword,
   addProfilePic,
+  updateUserInfo,
 } from "../controllers/authController.js";
 const authRouter = express.Router();
 
@@ -22,5 +23,6 @@ authRouter.get("/is-auth", userAuth, isAuthenticated);
 authRouter.post("/send-reset-otp", sendPasswordResetOtp);
 authRouter.post("/reset-password", resetPassword);
 authRouter.post("/add-profile-pic", userAuth, addProfilePic);
+authRouter.put("/update-user-info", userAuth, updateUserInfo);
 
 export default authRouter;

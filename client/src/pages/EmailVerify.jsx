@@ -3,6 +3,7 @@ import { AppContent } from "../context/AppContentProvider";
 import { toast } from "react-toastify";
 import axios from "axios";
 import { useNavigate } from "react-router";
+import BackToHome from "../components/BackToHome";
 
 const EmailVerify = () => {
   const navigate = useNavigate();
@@ -54,6 +55,7 @@ const EmailVerify = () => {
 
   return (
     <div className="h-screen w-full flex justify-center items-center bg-gray-500">
+      <BackToHome />
       <form onSubmit={onSubmitHandler}>
         <div className="w-fit h-fit p-10 rounded-md bg-amber-400 flex flex-col justify-center items-center">
           <div className="mb-4">
