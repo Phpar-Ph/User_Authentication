@@ -11,6 +11,7 @@ function Home() {
 
   useEffect(() => {
     isLogin && getUserData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (
