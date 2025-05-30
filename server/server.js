@@ -7,7 +7,7 @@ import authRouter from "./src/routes/authRoute.js";
 import userRouter from "./src/routes/userRoute.js";
 import { createRouteHandler } from "uploadthing/express";
 import { uploadRouter } from "./src/routes/uploadThingRoute.js";
-
+import postRouter from "./src/routes/postRoute.js";
 dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -24,6 +24,7 @@ app.use(cors({ origin: allowedOrigins, credentials: true }));
 
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
+app.use("/api/post", postRouter);
 app.use(
   "/api/uploadthing",
   createRouteHandler({

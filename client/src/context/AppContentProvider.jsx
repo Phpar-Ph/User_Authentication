@@ -9,7 +9,7 @@ export const AppContextProvider = (props) => {
   axios.defaults.withCredentials = true;
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [profilePic, setProfilePic] = useState(null);
-
+  const [getPostData, setGetPostData] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const [userData, setUserData] = useState(false);
 
@@ -22,6 +22,7 @@ export const AppContextProvider = (props) => {
       if (data.success) {
         setIsLogin(true);
         getUserData();
+        getPost();
       }
     } catch (error) {
       // Only show error toast if it's not an auth error
@@ -30,6 +31,22 @@ export const AppContextProvider = (props) => {
       }
     }
   };
+
+  const getPost = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/post/get-post`, {
+        withCredentials: true,
+      });
+
+      if (data.success) {
+        setGetPostData(data.post);
+      }
+    } catch (error) {
+      console.error("Get user data error:", error);
+      toast.error(error.response?.data?.message || "Failed to fetch post data");
+    }
+  };
+
   const getUserData = async () => {
     try {
       const { data } = await axios.get(`${backendUrl}/api/user/data`, {
@@ -65,6 +82,8 @@ export const AppContextProvider = (props) => {
     setUserData,
     getUserData,
     getAuthState,
+    getPost,
+    getPostData,
   };
   return (
     <AppContent.Provider value={value}>{props.children}</AppContent.Provider>

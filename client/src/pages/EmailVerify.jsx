@@ -58,6 +58,9 @@ const EmailVerify = () => {
       <BackToHome />
       <form onSubmit={onSubmitHandler}>
         <div className="w-fit h-fit p-10 rounded-md bg-amber-400 flex flex-col justify-center items-center">
+          <div>
+            <h1>An OTP has been sent to your email</h1>
+          </div>
           <div className="mb-4">
             <h1 className="text-2xl font-bold">Enter 6 digits OTP: </h1>
           </div>

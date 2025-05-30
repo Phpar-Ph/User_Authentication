@@ -1,16 +1,43 @@
-import { React, useContext, useEffect } from "react";
+import { React, useContext, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { AppContent } from "../context/AppContentProvider";
 import { useNavigate } from "react-router";
-
+import axios from "axios";
+import { toast } from "react-toastify";
 function Home() {
-  const { userData, getUserData, isLogin } = useContext(AppContent);
+  const { userData, getUserData, isLogin, backendUrl, getPost, getPostData } =
+    useContext(AppContent);
   const navigate = useNavigate();
+  const [description, setDescription] = useState();
   const defaultImage =
     "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg";
 
+  const handleChange = (e) => {
+    setDescription(e.target.value);
+  };
+
+  const handleSubmitPost = async (e) => {
+    e.preventDefault();
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/post/create-post",
+        { description },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        getUserData();
+        setDescription("");
+        navigate("/");
+      }
+    } catch (error) {
+      console.log("Error");
+      toast.error(error.message || "an error getUserData");
+    }
+  };
   useEffect(() => {
-    isLogin && getUserData();
+    isLogin && getUserData() && getPost();
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -53,6 +80,31 @@ function Home() {
               {userData?.name || "Developer"}
             </h2>
           </div>
+          <div className=" w-1/2">
+            <label htmlFor="post" className="block w-full">
+              Post
+              <textarea
+                name="post"
+                id="post"
+                placeholder="Enter post..."
+                className="bg-amber-50 block w-full"
+                value={description}
+                onChange={handleChange}
+              ></textarea>
+            </label>
+            <button
+              type="button"
+              className="bg-blue-400 text-amber-50 p-4"
+              onClick={handleSubmitPost}
+            >
+              Post
+            </button>
+          </div>
+        </div>
+        <div className="p-4 bg-gray-200 m-4 text-2xl">
+          {getPostData?.map((post) => (
+            <h1 key={post._id}>{post.description}</h1>
+          ))}
         </div>
       </div>
     </div>
