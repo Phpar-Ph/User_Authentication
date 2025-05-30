@@ -38,6 +38,7 @@ const userSchema = mongoose.Schema({
     type: String,
     default: "",
   },
+  post: {},
 });
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);

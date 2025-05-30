@@ -37,7 +37,7 @@ export const AppContextProvider = (props) => {
       const { data } = await axios.get(`${backendUrl}/api/post/get-post`, {
         withCredentials: true,
       });
-
+      console.log("UserPost :", data.post);
       if (data.success) {
         setGetPostData(data.post);
       }
@@ -57,6 +57,7 @@ export const AppContextProvider = (props) => {
 
       if (data.success) {
         setUserData(data.userData);
+
         // console.log("Updated userData:", data.userData); // Debug log
       } else {
         toast.error(data.message);

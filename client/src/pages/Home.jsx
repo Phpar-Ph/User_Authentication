@@ -4,6 +4,8 @@ import { AppContent } from "../context/AppContentProvider";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { fetchPost, createPost } from "../api/userApi";
 function Home() {
   const { userData, getUserData, isLogin, backendUrl, getPost, getPostData } =
     useContext(AppContent);
@@ -12,8 +14,22 @@ function Home() {
   const defaultImage =
     "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg";
 
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["post"],
+    queryFn: fetchPost,
+  });
+
+  const mutation = useMutation({
+    mutationFn: createPost,
+    // onSuccess: () => {
+    //   // Invalidate and refetch
+    //   queryClient.invalidateQueries({ queryKey: ['todos'] })
+    // },
+  });
+
   const handleChange = (e) => {
     setDescription(e.target.value);
+    mutation(description);
   };
 
   const handleSubmitPost = async (e) => {
@@ -101,6 +117,8 @@ function Home() {
             </button>
           </div>
         </div>
+        {isLoading && <p>Loading...</p>}
+        {error && <p>Error fetching data {error.message}</p>}
         <div className="p-4 bg-gray-200 m-4 text-2xl">
           {getPostData?.map((post) => (
             <h1 key={post._id}>{post.description}</h1>

@@ -3,7 +3,6 @@ import { useNavigate } from "react-router";
 import { AppContent } from "../context/AppContentProvider";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 function Login() {
   const navigate = useNavigate();
   const [state, setState] = useState("Login");

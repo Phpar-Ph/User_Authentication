@@ -26,6 +26,7 @@ export const createPost = async (req, res) => {
 export const getPost = async (req, res) => {
   try {
     const post = await Post.find();
+
     res.status(200).json({
       success: true,
       message: "post fetched",
