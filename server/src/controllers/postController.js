@@ -6,17 +6,24 @@ export const createPost = async (req, res) => {
     const { description } = req.body;
     const userId = req.userId;
     const user = await User.findById(userId);
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({
+        success: false,
+        message: "User not found",
+      });
     const newPost = new Post({
       userId,
-      description,
+      description: description.trim(),
     });
+
     await newPost.save();
-    const post = await Post.find();
+
+    const userPosts = await Post.find({ userId });
+
     res.status(201).json({
       success: true,
       message: "Post uploaded",
-      post,
+      userPosts,
     });
   } catch (err) {
     res.status(409).json({ message: err.message });
@@ -25,7 +32,8 @@ export const createPost = async (req, res) => {
 
 export const getPost = async (req, res) => {
   try {
-    const post = await Post.find();
+    const userId = req.userId;
+    const post = await Post.find({ userId });
 
     res.status(200).json({
       success: true,
