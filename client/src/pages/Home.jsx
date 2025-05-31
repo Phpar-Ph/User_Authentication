@@ -107,33 +107,35 @@ function Home() {
               {data?.name || "Developer"}
             </h2>
           </div>
-          <div className=" w-1/2">
-            <label htmlFor="post" className="block w-full">
-              Post
-              <textarea
-                name="post"
-                id="post"
-                placeholder="Enter post..."
-                className="bg-amber-50 block w-full"
-                value={description}
-                onChange={handleChange}
-              ></textarea>
-            </label>
-            <button
-              type="button"
-              className="bg-blue-400 text-amber-50 p-4"
-              onClick={handleSubmitPost}
-            >
-              Post
-            </button>
-          </div>
-        </div>
-        {isLoading && <p>Loading...</p>}
-        {error && <p>Error fetching data {error.message}</p>}
-        <div className="p-4 bg-gray-200 m-4 text-2xl">
-          {getPostData?.map((post) => (
-            <h1 key={post._id}>{post.description}</h1>
-          ))}
+          {isLogin && (
+            <div className=" w-1/2">
+              <label htmlFor="post" className="block w-full">
+                Post
+                <textarea
+                  name="post"
+                  id="post"
+                  placeholder="Enter post..."
+                  className="bg-amber-50 block w-full"
+                  value={description}
+                  onChange={handleChange}
+                ></textarea>
+              </label>
+              <button
+                type="button"
+                className="bg-blue-400 text-amber-50 p-4"
+                onClick={handleSubmitPost}
+              >
+                Post
+              </button>
+              {isLoading && <p>Loading...</p>}
+              {error && <p>Error fetching data {error.message}</p>}
+              <div className="p-4 bg-gray-200 m-4 text-2xl">
+                {getPostData?.map((post) => (
+                  <h1 key={post._id}>{post.description}</h1>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

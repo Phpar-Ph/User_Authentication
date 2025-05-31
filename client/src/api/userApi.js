@@ -3,10 +3,10 @@ import { userViewStore } from "../store/userStore";
 
 const backendUrl = "http://localhost:5000";
 
-export const createPost = async (description) => {
+export const createPost = async (formData) => {
   const { data } = await axios.post(
     backendUrl + "/api/post/create-post",
-    { description },
+    { description: formData.description },
     { withCredentials: true }
   );
   return data;
