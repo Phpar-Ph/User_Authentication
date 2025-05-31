@@ -6,30 +6,39 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery, useQueryClient, useMutation } from "@tanstack/react-query";
 import { userViewStore } from "../store/userStore";
-import { userAuth } from "../api/userApi";
-const formSchema = z.object({
-  fullName: z.string().min(1, "Full Name is required"),
+// import { userAuth } from "../api/userApi";
+import axios from "axios";
+
+const formRegisterSchema = z.object({
+  name: z.string().min(1, "Full Name is required"),
   email: z.string().email("Invalid email address"),
   password: z.string().min(6, "Password must be at least 6 characters"),
 });
 
+const formLoginSchema = z.object({
+  email: z.string().email("Invalid email address"),
+  password: z.string().min(6, "Password must be at least 6 characters"),
+});
+
+const backendUrl = "http://localhost:5000";
 function Login() {
   const { view, setView } = userViewStore();
   const navigate = useNavigate();
   const {
     register,
     handleSubmit,
-    watch,
     reset,
     formState: { errors, isSubmitting },
   } = useForm({
     defaultValues: {
-      fullName: "",
+      name: "",
       email: "",
       password: "",
     },
 
-    resolver: zodResolver(formSchema),
+    resolver: zodResolver(
+      view === "Login" ? formLoginSchema : formRegisterSchema
+    ),
   });
   // const { backendUrl, setIsLogin, getUserData } = useContext(AppContent);
   const queryClient = useQueryClient();
@@ -42,16 +51,23 @@ function Login() {
   //   },
   // });
 
-  const { mutate } = useMutation({
-    mutationFn: userAuth,
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      console.log(data);
+      return await axios.post(backendUrl + "/api/auth/register", {
+        name: data.name,
+        email: data.email,
+        password: data.password,
+      });
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["userAuth"] }), navigate("/");
     },
   });
 
-  const onSubmit = async (formData) => {
-    console.log(formData);
-    mutate({ data: formData });
+  const onSubmit = async (data) => {
+    // console.log(data);
+    mutation.mutate({ data });
   };
   useEffect(() => {
     reset();
@@ -84,12 +100,12 @@ function Login() {
                 <label>
                   Full Name
                   <input
-                    {...register("fullName")}
+                    {...register("name")}
                     placeholder="Enter your full name..."
                     className="  outline-none rounded-md  bg-blue-100 border-gray-300 p-4  text-black w-full"
                   />
                 </label>
-                <p>{errors.fullName?.message}</p>
+                <p>{errors.name?.message}</p>
               </div>
             ) : (
               <></>
