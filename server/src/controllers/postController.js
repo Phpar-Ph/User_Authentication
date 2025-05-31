@@ -25,7 +25,8 @@ export const createPost = async (req, res) => {
 
 export const getPost = async (req, res) => {
   try {
-    const post = await Post.find();
+    const userId = req.userId;
+    const post = await Post.find({ userId });
 
     res.status(200).json({
       success: true,

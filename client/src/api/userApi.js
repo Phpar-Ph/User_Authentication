@@ -2,10 +2,10 @@ import axios from "axios";
 
 const backendUrl = "http://localhost:5000";
 
-export const createPost = async (description) => {
+export const createPost = async (postData) => {
   const { data } = await axios.post(
     backendUrl + "/api/post/create-post",
-    { description },
+    { description: postData.description },
     { withCredentials: true }
   );
   return data.json();
