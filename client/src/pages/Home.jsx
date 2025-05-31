@@ -1,23 +1,20 @@
-import { React, useEffect, useState } from "react";
+import { React, useEffect, useState, useContext } from "react";
 import Navbar from "../components/Navbar";
 import { AppContent } from "../context/AppContentProvider";
 import { useNavigate } from "react-router";
-import axios from "axios";
-import { toast } from "react-toastify";
-import { useMutation, useQuery } from "@tanstack/react-query";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { fetchPost, createPost } from "../api/userApi";
-import { toast } from "react-toastify";
-import { useAuthStore } from "../store/userStore";
+
 function Home() {
-  const { userData, getUserData, isLogin, backendUrl, getPost, getPostData } =
-    useContext(AppContent);
+  const { getUserData, isLogin, getPost, getPostData } = useContext(AppContent);
   const navigate = useNavigate();
   const [description, setDescription] = useState();
   const queryClient = useQueryClient();
   const defaultImage =
     "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg";
 
-  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["post"],
     queryFn: async () => {
@@ -32,34 +29,39 @@ function Home() {
 
   const { mutate } = useMutation({
     mutationFn: createPost,
-    // onSuccess: () => {
-    //   // Invalidate and refetch
-    //   queryClient.invalidateQueries({ queryKey: ['todos'] })
-    // },
+    onSuccess: () => {
+      // Invalidate and refetch
+      queryClient.invalidateQueries({ queryKey: ["todos"] });
+    },
   });
 
   const handleChange = (e) => {
     setDescription(e.target.value);
   };
-  const handleSubmitPost = async (e) => {
-    e.preventDefault();
-    try {
-      const { data } = await axios.post(
-        backendUrl + "/api/post/create-post",
-        { description },
-        { withCredentials: true }
-      );
 
-      if (data.success) {
-        getUserData();
-        setDescription("");
-        navigate("/");
-      }
-    } catch (error) {
-      console.log("Error");
-      toast.error(error.message || "an error getUserData");
-    }
+  const handleSubmitPost = () => {
+    mutate({ description });
   };
+
+  // const handleSubmitPost = async (e) => {
+  //   e.preventDefault();
+  //   try {
+  //     const { data } = await axios.post(
+  //       backendUrl + "/api/post/create-post",
+  //       { description },
+  //       { withCredentials: true }
+  //     );
+
+  //     if (data.success) {
+  //       getUserData();
+  //       setDescription("");
+  //       navigate("/");
+  //     }
+  //   } catch (error) {
+  //     console.log("Error");
+  //     toast.error(error.message || "an error getUserData");
+  //   }
+  // };
   useEffect(() => {
     isLogin && getUserData() && getPost();
 
@@ -75,7 +77,7 @@ function Home() {
           <div className="relative group mb-8">
             <div className="w-80 h-80 rounded-full overflow-hidden shadow-2xl border-4 border-amber-600">
               <img
-                src={user?.profilePic || defaultImage}
+                src={data?.profilePic || defaultImage}
                 alt="Profile"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
@@ -102,7 +104,7 @@ function Home() {
               Welcome{isLogin ? "," : ""}
             </h1>
             <h2 className="text-4xl font-bold text-amber-700">
-              {user?.name || "Developer"}
+              {data?.name || "Developer"}
             </h2>
           </div>
           <div className=" w-1/2">
