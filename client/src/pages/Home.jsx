@@ -1,32 +1,41 @@
-import { React, useContext, useEffect, useState } from "react";
+import { React, useEffect, useState } from "react";
 import Navbar from "../components/Navbar";
 import { AppContent } from "../context/AppContentProvider";
 import { useNavigate } from "react-router";
 import axios from "axios";
 import { toast } from "react-toastify";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { fetchPost, createPost } from "../api/userApi";
+import { toast } from "react-toastify";
+import { useAuthStore } from "../store/userStore";
 function Home() {
-  const { userData, getUserData, isLogin, backendUrl } = useContext(AppContent);
+  const { userData, getUserData, isLogin, backendUrl, getPost, getPostData } =
+    useContext(AppContent);
   const navigate = useNavigate();
   const [description, setDescription] = useState();
   const queryClient = useQueryClient();
   const defaultImage =
     "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg";
 
+  const queryClient = useQueryClient();
   const { data, isLoading, error } = useQuery({
     queryKey: ["post"],
-    queryFn: fetchPost,
+    queryFn: async () => {
+      if (!isLogin) {
+        return [];
+      }
+      const response = await fetchPost();
+      return response;
+    },
+    enabled: isLogin,
   });
 
-  const mutation = useMutation({
+  const { mutate } = useMutation({
     mutationFn: createPost,
-    onSuccess: () => {
-      toast.success("Post Created");
-      queryClient.invalidateQueries({ queryKey: ["post"] });
-      setDescription("");
-      toast.success("Post created successfully");
-    },
+    // onSuccess: () => {
+    //   // Invalidate and refetch
+    //   queryClient.invalidateQueries({ queryKey: ['todos'] })
+    // },
   });
 
   const handleChange = (e) => {
@@ -34,32 +43,25 @@ function Home() {
   };
   const handleSubmitPost = async (e) => {
     e.preventDefault();
-    if (!description?.trim()) {
-      return toast.error("Post cannot be empty");
+    try {
+      const { data } = await axios.post(
+        backendUrl + "/api/post/create-post",
+        { description },
+        { withCredentials: true }
+      );
+
+      if (data.success) {
+        getUserData();
+        setDescription("");
+        navigate("/");
+      }
+    } catch (error) {
+      console.log("Error");
+      toast.error(error.message || "an error getUserData");
     }
-    mutation.mutate({ description: description.trim() });
   };
-
-  // const handleSubmitPost = async (e) => {
-  //   e.preventDefault();
-  //   try {
-  //     const { data } = await axios.post(
-  //       backendUrl + "/api/post/create-post",
-  //       { description },
-  //       { withCredentials: true }
-  //     );
-
-  //     if (data.success) {
-  //       setDescription("");
-  //       navigate("/");
-  //     }
-  //   } catch (error) {
-  //     console.log("Error");
-  //     toast.error(error.message || "an error getUserData");
-  //   }
-  // };
   useEffect(() => {
-    isLogin && getUserData();
+    isLogin && getUserData() && getPost();
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -73,7 +75,7 @@ function Home() {
           <div className="relative group mb-8">
             <div className="w-80 h-80 rounded-full overflow-hidden shadow-2xl border-4 border-amber-600">
               <img
-                src={userData?.profilePic || defaultImage}
+                src={user?.profilePic || defaultImage}
                 alt="Profile"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
@@ -100,38 +102,36 @@ function Home() {
               Welcome{isLogin ? "," : ""}
             </h1>
             <h2 className="text-4xl font-bold text-amber-700">
-              {userData?.name || "Developer"}
+              {user?.name || "Developer"}
             </h2>
           </div>
-          {isLogin && (
-            <div className=" w-1/2">
-              <label htmlFor="post" className="block w-full">
-                Post
-                <textarea
-                  name="post"
-                  id="post"
-                  placeholder="Enter post..."
-                  className="bg-amber-50 block w-full"
-                  value={description}
-                  onChange={handleChange}
-                ></textarea>
-              </label>
-              <button
-                type="button"
-                className="bg-blue-400 text-amber-50 p-4"
-                onClick={handleSubmitPost}
-              >
-                Post
-              </button>
-              {isLoading && <p>Loading...</p>}
-              {error && <p>Error fetching data {error.message}</p>}
-              <div className="p-4 bg-gray-200 m-4 text-2xl">
-                {data?.map((post) => (
-                  <h1 key={post._id}>{post.description}</h1>
-                ))}
-              </div>
-            </div>
-          )}
+          <div className=" w-1/2">
+            <label htmlFor="post" className="block w-full">
+              Post
+              <textarea
+                name="post"
+                id="post"
+                placeholder="Enter post..."
+                className="bg-amber-50 block w-full"
+                value={description}
+                onChange={handleChange}
+              ></textarea>
+            </label>
+            <button
+              type="button"
+              className="bg-blue-400 text-amber-50 p-4"
+              onClick={handleSubmitPost}
+            >
+              Post
+            </button>
+          </div>
+        </div>
+        {isLoading && <p>Loading...</p>}
+        {error && <p>Error fetching data {error.message}</p>}
+        <div className="p-4 bg-gray-200 m-4 text-2xl">
+          {getPostData?.map((post) => (
+            <h1 key={post._id}>{post.description}</h1>
+          ))}
         </div>
       </div>
     </div>
