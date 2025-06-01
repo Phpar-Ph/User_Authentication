@@ -1,26 +1,34 @@
 import { create } from "zustand";
-import { isAuth, getUserData } from "../api/userApi";
+import { persist } from "zustand/middleware";
+import {
+  useGetUserData as getUser,
+  useGetUserAuth as isAuth,
+} from "../api/userApi";
 
-export const userViewStore = create((set) => ({
-  view: "login",
-  setView: (view) => set({ view }),
-}));
-
+export const useLoginStateStore = create(
+  persist(
+    (set) => ({
+      isLogin: false,
+      setIsLogin: (isLogin) => set({ isLogin }),
+    }),
+    {
+      name: "login-state",
+    }
+  )
+);
 export const useAuthStore = create((set) => ({
   isAuthenticated: false,
   user: null,
-  isLogin: false,
+  setUserData: null,
 
   checkAuth: async () => {
     try {
-      const authResult = await isAuth();
-      if (authResult?.success) {
-        const userData = await getUserData();
+      const authResult = isAuth();
+      if (authResult?.isSuccess) {
+        const userData = getUser();
         set({
           isAuthenticated: true,
           user: userData,
-          loading: false,
-          isLogin: true,
         });
       } else {
         set({ isAuthenticated: false, user: null });

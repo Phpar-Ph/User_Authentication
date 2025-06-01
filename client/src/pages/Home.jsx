@@ -1,31 +1,28 @@
-import { React, useEffect, useState, useContext } from "react";
+import { React, useState } from "react";
 import Navbar from "../components/Navbar";
 import { AppContent } from "../context/AppContentProvider";
 import { useNavigate } from "react-router";
 // import axios from "axios";
 // import { toast } from "react-toastify";
-import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { fetchPost, createPost } from "../api/userApi";
-
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { createPost } from "../api/userApi";
+import { useGetUserData, useGetUserAuth } from "../api/userApi";
+import { useLoginStateStore } from "../store/userStore";
 function Home() {
-  const { getUserData, isLogin, getPost, getPostData } = useContext(AppContent);
   const navigate = useNavigate();
+  const isLogin = useLoginStateStore((state) => state.isLogin);
   const [description, setDescription] = useState();
   const queryClient = useQueryClient();
   const defaultImage =
     "https://t3.ftcdn.net/jpg/00/64/67/52/360_F_64675209_7ve2XQANuzuHjMZXP3aIYIpsDKEbF5dD.jpg";
 
-  const { data, isLoading, error } = useQuery({
-    queryKey: ["post"],
-    queryFn: async () => {
-      if (!isLogin) {
-        return [];
-      }
-      const response = await fetchPost();
-      return response;
-    },
-    enabled: isLogin,
-  });
+  const { data: authData, isLoading: authLoading } = useGetUserAuth();
+  const isAuthenticated = authData?.success ?? false;
+  const {
+    data: userData,
+    isLoading: userLoading,
+    error,
+  } = useGetUserData(isAuthenticated);
 
   const { mutate } = useMutation({
     mutationFn: createPost,
@@ -34,15 +31,13 @@ function Home() {
       queryClient.invalidateQueries({ queryKey: ["todos"] });
     },
   });
-
   const handleChange = (e) => {
     setDescription(e.target.value);
   };
-
   const handleSubmitPost = () => {
     mutate({ description });
   };
-
+  console.log(" Login ", isLogin);
   // const handleSubmitPost = async (e) => {
   //   e.preventDefault();
   //   try {
@@ -62,11 +57,20 @@ function Home() {
   //     toast.error(error.message || "an error getUserData");
   //   }
   // };
-  useEffect(() => {
-    isLogin && getUserData() && getPost();
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  if (authLoading || (isAuthenticated && userLoading)) {
+    return <p>Loading...</p>;
+  }
+
+  if (!isAuthenticated) {
+    return <p>You are not authenticated.</p>;
+  }
+
+  // useEffect(() => {
+  //   if (isLogin) {
+  //     console.log(userData);
+  //   }
+  // }, [isLogin, userData]);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-amber-50 to-amber-200">
@@ -77,7 +81,7 @@ function Home() {
           <div className="relative group mb-8">
             <div className="w-80 h-80 rounded-full overflow-hidden shadow-2xl border-4 border-amber-600">
               <img
-                src={data?.profilePic || defaultImage}
+                src={userData?.profilePic || defaultImage}
                 alt="Profile"
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 onError={(e) => {
@@ -104,7 +108,7 @@ function Home() {
               Welcome{isLogin ? "," : ""}
             </h1>
             <h2 className="text-4xl font-bold text-amber-700">
-              {data?.name || "Developer"}
+              {userData?.name || "Developer"}
             </h2>
           </div>
           {isLogin && (
@@ -127,13 +131,13 @@ function Home() {
               >
                 Post
               </button>
-              {isLoading && <p>Loading...</p>}
+              {authLoading && <p>Loading...</p>}
               {error && <p>Error fetching data {error.message}</p>}
-              <div className="p-4 bg-gray-200 m-4 text-2xl">
-                {getPostData?.map((post) => (
+              {/* <div className="p-4 bg-gray-200 m-4 text-2xl">
+                {data?.map((post) => (
                   <h1 key={post._id}>{post.description}</h1>
                 ))}
-              </div>
+              </div> */}
             </div>
           )}
         </div>

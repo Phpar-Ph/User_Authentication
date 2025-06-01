@@ -1,46 +1,50 @@
-import { React, useContext } from "react";
+import { React } from "react";
 import { NavLink, useNavigate } from "react-router";
 import { AppContent } from "../context/AppContentProvider";
-import axios from "axios";
-import { toast } from "react-toastify";
+// import axios from "axios";
+// import { toast } from "react-toastify";
+import { useLoginStateStore } from "../store/userStore";
+import { useGetUserData } from "../api/userApi";
 function Navbar() {
   const navigate = useNavigate();
-  const { userData, backendUrl, setUserData, setIsLogin } =
-    useContext(AppContent);
+  const isLogin = useLoginStateStore((state) => state.isLogin);
+  const { data: userData } = useGetUserData();
 
-  const logout = async () => {
-    try {
-      axios.defaults.withCredentials = true;
-      const { data } = await axios.post(backendUrl + "/api/auth/logout");
-      data.success && setIsLogin(false);
-      data.success && setUserData(false);
-      navigate("/");
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
-  const sendVerificationOtp = async () => {
-    try {
-      axios.defaults.withCredentials = true;
-      const { data } = await axios.post(
-        backendUrl + "/api/auth/send-verify-otp"
-      );
-
-      if (data.success) {
-        navigate("/email-verify");
-        toast.success(data.message);
-      } else {
-        toast.error(data.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
-    }
-  };
-
-  // const profile = () => {
-  //   navigate("/profile");
+  // const logout = async () => {
+  //   try {
+  //     axios.defaults.withCredentials = true;
+  //     const { data } = await axios.post(backendUrl + "/api/auth/logout");
+  //     data.success && setIsLogin(false);
+  //     data.success && setUserData(false);
+  //     navigate("/");
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   }
   // };
+
+  // const sendVerificationOtp = async () => {
+  //   try {
+  //     axios.defaults.withCredentials = true;
+  //     const { data } = await axios.post(
+  //       backendUrl + "/api/auth/send-verify-otp"
+  //     );
+
+  //     if (data.success) {
+  //       navigate("/email-verify");
+  //       toast.success(data.message);
+  //     } else {
+  //       toast.error(data.message);
+  //     }
+  //   } catch (error) {
+  //     toast.error(error.message);
+  //   }
+  // };
+
+  // useEffect(() => {
+  //   if (isLogin) {
+  //     console.log(isLogin);
+  //   }
+  // }, [isLogin]);
 
   return (
     <nav className="bg-gradient-to-r from-amber-600 to-amber-700 shadow-lg">
@@ -55,7 +59,7 @@ function Navbar() {
           </div>
 
           <div className="flex items-center">
-            {userData ? (
+            {isLogin ? (
               <div className="relative group">
                 <button className="flex items-center space-x-3 focus:outline-none">
                   <div className="w-10 h-10 flex items-center justify-center rounded-full bg-amber-800 text-white text-xl font-semibold transition-transform group-hover:scale-105">
@@ -72,10 +76,10 @@ function Navbar() {
 
                   {!userData.isAccountVerified && (
                     <button
-                      onClick={() => {
-                        sendVerificationOtp();
-                        navigate("/email-verify");
-                      }}
+                      // onClick={() => {
+                      //   sendVerificationOtp();
+                      //   navigate("/email-verify");
+                      // }}
                       className="w-full text-left px-4 py-2 text-sm text-amber-700 hover:bg-amber-50 flex items-center gap-2"
                     >
                       <span className="text-xs">📧</span> Verify Email
@@ -90,7 +94,7 @@ function Navbar() {
                   </button>
 
                   <button
-                    onClick={logout}
+                    // onClick={logout}
                     className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center gap-2"
                   >
                     <span className="text-xs">🚪</span> Logout
