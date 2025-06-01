@@ -32,6 +32,7 @@ const Register = () => {
     mutate(data, {
       onSuccess: () => {
         setIsLogin(true);
+
         navigate("/");
       },
     });
@@ -52,13 +53,16 @@ const Register = () => {
           <h2 className="text-2xl font-bold text-amber-50">Create Account</h2>
           <p className="text-gray-300 text-md">"Create your Account"</p>
         </div>
-        <form onSubmit={handleSubmit(onSubmit)}>
+        <form onSubmit={handleSubmit(onSubmit)} autoComplete="off">
           <div className="flex flex-col   gap-4 w-96">
             <div>
-              <label>
+              <label htmlFor="name">
                 Full Name
                 <input
                   {...register("name")}
+                  type="name"
+                  name="name"
+                  autoComplete="off"
                   placeholder="Enter your full name..."
                   className="  outline-none rounded-md  bg-blue-100 border-gray-300 p-4  text-black w-full"
                 />
@@ -67,10 +71,12 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="">
+              <label htmlFor="email">
                 Email
                 <input
                   {...register("email")}
+                  type="email"
+                  name="email"
                   placeholder="Enter your email..."
                   className=" bg-blue-100 rounded-md outline-none border-gray-300 p-4  text-black w-full"
                 />
@@ -79,10 +85,12 @@ const Register = () => {
             </div>
 
             <div>
-              <label htmlFor="">
+              <label htmlFor="password">
                 Password
                 <input
                   {...register("password")}
+                  type="password"
+                  name="password"
                   placeholder="Enter your password..."
                   className=" bg-blue-100 rounded-md outline-none border-gray-300 p-4  text-black w-full"
                 />

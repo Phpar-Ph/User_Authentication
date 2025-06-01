@@ -16,6 +16,11 @@ export const useLoginStateStore = create(
     }
   )
 );
+// export const useLoginStateStore = create((set) => ({
+//   isLogin: false,
+//   setIsLogin: (isLogin) => set({ isLogin }),
+// }));
+
 export const useAuthStore = create((set) => ({
   isAuthenticated: false,
   user: null,

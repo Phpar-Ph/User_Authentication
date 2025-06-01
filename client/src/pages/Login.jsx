@@ -1,11 +1,11 @@
 import { React } from "react";
 import { useNavigate } from "react-router";
-import { AppContent } from "../context/AppContentProvider";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useLoginUsers } from "../api/userApi";
 import { toast } from "react-toastify";
+import { useLoginStateStore } from "../store/userStore";
 
 const formLoginSchema = z.object({
   email: z.string().email("Invalid email address"),
@@ -14,6 +14,8 @@ const formLoginSchema = z.object({
 
 function Login() {
   const navigate = useNavigate();
+  const { mutate } = useLoginUsers();
+  const setIsLogin = useLoginStateStore((state) => state.setIsLogin);
   const {
     register,
     handleSubmit,
@@ -27,11 +29,10 @@ function Login() {
     resolver: zodResolver(formLoginSchema),
   });
 
-  const { mutate } = useLoginUsers();
-
   const onSubmit = (data) => {
     mutate(data, {
       onSuccess: () => {
+        setIsLogin(true);
         toast.success("Sign in successful!");
         navigate("/");
       },
@@ -60,10 +61,12 @@ function Login() {
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex flex-col   gap-4 w-96">
             <div>
-              <label htmlFor="">
+              <label htmlFor="email">
                 Email
                 <input
                   {...register("email")}
+                  type="email"
+                  name="email"
                   placeholder="Enter your email..."
                   className=" bg-blue-100 rounded-md outline-none border-gray-300 p-4  text-black w-full"
                 />
@@ -72,10 +75,12 @@ function Login() {
             </div>
 
             <div>
-              <label htmlFor="">
+              <label htmlFor="password">
                 Password
                 <input
                   {...register("password")}
+                  type="password"
+                  name="password"
                   placeholder="Enter your password..."
                   className=" bg-blue-100 rounded-md outline-none border-gray-300 p-4  text-black w-full"
                 />

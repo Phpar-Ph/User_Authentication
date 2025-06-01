@@ -1,34 +1,22 @@
 import axios from "axios";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 const backendUrl = "http://localhost:5000";
 import { toast } from "react-toastify";
 
-export const createPost = async (formData) => {
-  const { data } = await axios.post(
-    backendUrl + "/api/post/create-post",
-    { description: formData.description },
-    { withCredentials: true }
-  );
-  return data;
-};
-
-export const fetchPost = async () => {
-  const { data } = await axios.get(`${backendUrl}/api/post/get-post`, {
-    withCredentials: true,
-  });
-  return data.post;
-};
-
+// Login
 export const useLoginUsers = () => {
   return useMutation({
     mutationFn: (data) =>
       axios
-        .post(backendUrl + "/api/auth/login", data, { withCredentials: true })
+        .post(
+          backendUrl + "/api/auth/login",
+          { email: data.email, password: data.password },
+          { withCredentials: true }
+        )
         .then((res) => res.data),
-    onSuccess: () => {
-      // saveState("userData",data);
-      toast.success("Sign in successful!");
-    },
+    // onSuccess: () => {
+    //   toast.success("Sign in successful!");
+    // },
     onError: () => {
       toast.error("Sign-in failed, please try again.");
     },
@@ -52,8 +40,6 @@ export const useRegister = () => {
         )
         .then((res) => res.data),
     onSuccess: () => {
-      // saveState("userData", data);
-
       toast.success("Sign up successful!");
     },
     onError: (data) => {
@@ -62,39 +48,64 @@ export const useRegister = () => {
   });
 };
 
-export const useGetUserData = (enabled) => {
+export const useGetUserData = (enabled = false) => {
   return useQuery({
     queryKey: ["userData"],
     queryFn: () =>
       axios
-        .get(`${backendUrl}/api/user/data`, { withCredentials: true })
+        .get(`${backendUrl}/api/user/data`, {
+          withCredentials: true,
+        })
         .then((res) => res.data.userData),
-    enabled,
-    onSuccess: (data) => {
-      toast.success(data.message);
-    },
+    enabled: !!enabled,
+    staleTime: 1000 * 60 * 5,
+    cacheTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
+    retry: false,
   });
 };
 
-export const useGetUserAuth = () => {
+export const useGetUserAuth = (enabled = false) => {
+  const queryClient = useQueryClient();
   return useQuery({
     queryKey: ["authStatus"],
     queryFn: () =>
       axios
-        .get(`${backendUrl}/api/auth/is-auth`, { withCredentials: true })
+        .get(`${backendUrl}/api/auth/is-auth`, {
+          withCredentials: true,
+        })
         .then((res) => res.data),
+    enabled: !!enabled,
+    staleTime: 1000 * 60 * 5,
+    cacheTime: 1000 * 60 * 30,
+    refetchOnWindowFocus: false,
+    retry: 1,
     onSuccess: (data) => {
-      toast.success(data.message);
+      if (!data.success) {
+        queryClient.invalidateQueries({ queryKey: ["userData"] });
+      }
     },
   });
 };
 
-export const logout = async () => {
-  try {
-    axios.defaults.withCredentials = true;
-    const { data } = await axios.post(backendUrl + "/api/auth/logout");
-    return data;
-  } catch (error) {
-    console.log(error.message);
-  }
+export const useLogout = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: () => {
+      return axios.post(
+        backendUrl + "/api/auth/logout",
+        {},
+        { withCredentials: true }
+      );
+    },
+    onSuccess: (data) => {
+      queryClient.clear();
+      queryClient.invalidateQueries();
+      queryClient.setQueryData(["authStatus"], { success: false, user: null });
+      toast.success(data.message || "Logged out successfully");
+    },
+    onError: (error) => {
+      toast.error(error.message || "Failed to logout");
+    },
+  });
 };
